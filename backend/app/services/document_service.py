@@ -18,13 +18,21 @@ class DocumentService:
     2. extraer texto
     3. trocear
     4. vectorizar
-    5. guardar en Chroma
+    5. guardar en Chroma (limpia la colección anterior)
     """
 
     def __init__(self):
         os.makedirs(UPLOAD_DIR, exist_ok=True)
         self.embedding_service = EmbeddingService()
         self.vector_service = VectorService()
+
+        # Limpia la colección anterior en Chroma para evitar resultados mezclados
+        try:
+            print("🧹 Limpiando colección anterior de Chroma...")
+            self.vector_service.collection.delete()  # elimina todo el contenido previo
+            print("✅ Colección limpia")
+        except Exception as e:
+            print("⚠️ No se pudo limpiar la colección (posiblemente vacía):", e)
 
     async def process_upload(self, file: UploadFile):
         # 1. guardar archivo físico
@@ -33,16 +41,22 @@ class DocumentService:
         # 2. extraer texto
         text = self._extract_text_from_pdf(saved_path)
 
-        # 3. trocear
+        # 3. trocear en chunks
         chunks = self._chunk_text(text, chunk_size=800)
 
         # 4. generar embeddings y guardar en vector db
         doc_id = str(uuid.uuid4())
+
+        # Si prefieres crear una colección por documento, descomenta esta línea:
+        # self.vector_service.create_collection(doc_id)
+
         self.vector_service.add_document_chunks(
             doc_id=doc_id,
             chunks=chunks,
             metadata={"filename": file.filename}
         )
+
+        print(f"✅ Documento indexado: {file.filename} ({len(chunks)} fragmentos)")
 
         return {
             "id": doc_id,
@@ -63,6 +77,7 @@ class DocumentService:
         return filepath
 
     def _extract_text_from_pdf(self, path: str) -> str:
+        """Extrae texto completo de un PDF"""
         reader = PdfReader(path)
         all_text = []
         for page in reader.pages:
@@ -71,6 +86,7 @@ class DocumentService:
         return "\n".join(all_text)
 
     def _chunk_text(self, text: str, chunk_size: int = 800) -> List[str]:
+        """Divide el texto en fragmentos manejables"""
         words = text.split()
         chunks = []
         current = []
