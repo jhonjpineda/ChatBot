@@ -1,17 +1,10 @@
-# Entornos virtuales
 backend/.venv/
 venv/
-
-# Archivos de sistema
 __pycache__/
 *.pyc
 *.log
 *.tmp
 .DS_Store
 Thumbs.db
-
-# Variables de entorno
 backend/.env
-
-# Carpeta de archivos subidos
 backend/uploads/

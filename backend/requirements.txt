@@ -1,0 +1,14 @@
+fastapi==0.115.0
+uvicorn[standard]==0.30.6
+python-multipart==0.0.9
+pydantic==2.8.2
+pydantic-settings==2.4.0
+requests==2.32.3
+
+# RAG
+chromadb==0.5.4
+sentence-transformers==2.7.0
+pypdf==4.3.1
+
+# Evitar rompimientos por NumPy 2.x en algunos wheels
+numpy<2.0
