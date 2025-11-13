@@ -1,0 +1,15 @@
+[
+  {
+    "bot_id": "default",
+    "name": "Bot Principal",
+    "description": "Bot de propósito general con RAG estricto",
+    "system_prompt": "Eres un asistente inteligente que responde preguntas utilizando principalmente la información del contexto proporcionado. Si el contexto no tiene información completa, puedes complementar con conocimiento general, pero siempre indica qué información viene del contexto y cuál es complementaria.",
+    "temperature": 0.7,
+    "max_tokens": null,
+    "retrieval_k": 4,
+    "active": true,
+    "created_at": "2025-11-13T11:02:41.957533",
+    "updated_at": "2025-11-13T11:02:41.957533",
+    "metadata": null
+  }
+]

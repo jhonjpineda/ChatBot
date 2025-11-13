@@ -1,0 +1,37 @@
+{
+  "interactions": [
+    {
+      "timestamp": "2025-11-13T11:09:05.751450",
+      "bot_id": "default",
+      "question": "Hablame de los primeros pasos del espiritu emprendedor",
+      "answer": "No tengo información sobre eso en mi base de conocimiento.",
+      "sources_count": 3,
+      "response_time_ms": 9529.306650161743,
+      "success": true,
+      "error": null,
+      "question_length": 54,
+      "answer_length": 58
+    },
+    {
+      "timestamp": "2025-11-13T11:17:11.998763",
+      "bot_id": "default",
+      "question": "que dice el texto \"Primeros pasos hacia el éxito emprendedor\"",
+      "answer": "El texto \"Primeros pasos hacia el éxito emprendedor\" menciona los siguientes puntos:\n\n1. **Soñar con un futuro exitoso**: El autor invita a soñar con las cosas que se desean conseguir y imaginar hasta dónde se pueden llegar para demostrar la valía de uno mismo.\n2. **Preguntas para reflexionar sobre el emprendimiento**: Se presentan preguntas como:\n * ¿Has tenido un sueño en el cual te ves como una persona exitosa?\n * ¿Qué te gustaría hacer o vender?\n * ¿Te ves como empleado o como dueño de tu propia empresa?\n * ¿Qué tal producir algo de lo que has aprendido a hacer en tu vida?\n3. **La importancia de la imaginación**: El autor sugiere cerrar los ojos y dejar volar la imaginación para pensar en las respuestas a estas preguntas.\n4. **La posibilidad de ser dueño de una empresa**: Se menciona que se puede imaginar producir algo que se haya aprendido a hacer en la vida.\n\nEn general, el texto enfatiza la importancia de soñar con un futuro exitoso y reflexionar sobre los pasos necesarios para alcanzarlo.",
+      "sources_count": 3,
+      "response_time_ms": 33462.316036224365,
+      "success": true,
+      "error": null,
+      "question_length": 61,
+      "answer_length": 1011
+    }
+  ],
+  "daily_stats": {},
+  "document_uploads": [
+    {
+      "timestamp": "2025-11-13T11:08:13.843106",
+      "bot_id": "default",
+      "filename": "PDF_Podcast_1_2-4.pdf",
+      "chunks_count": 3
+    }
+  ]
+}
