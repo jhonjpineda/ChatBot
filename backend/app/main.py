@@ -2,27 +2,55 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
-from app.api import chat
-from app.api import documents  # <-- nuevo
+from app.api import chat, documents, bots, analytics
 
 app = FastAPI(
     title=settings.APP_NAME,
-    version="0.1.0",
-    description="API del chatbot RAG multisitio"
+    version="1.0.0",
+    description="API del chatbot RAG multi-tenant con gestión de bots y analytics"
 )
 
+# Configurar límite de tamaño de archivo (50MB)
+app.router.redirect_slashes = False
+
+# CORS configurado para permitir embeddings en cualquier sitio
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*"],  # En producción, especificar dominios permitidos
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-app.include_router(chat.router, prefix="/chat", tags=["chat"])
-app.include_router(documents.router, prefix="/documents", tags=["documents"])
+# Rutas principales
+app.include_router(chat.router, prefix="/chat", tags=["Chat"])
+app.include_router(documents.router, prefix="/documents", tags=["Documents"])
+app.include_router(bots.router, prefix="/bots", tags=["Bots"])
+app.include_router(analytics.router, prefix="/analytics", tags=["Analytics"])
 
 
-@app.get("/")
+@app.get("/", tags=["Health"])
 def root():
-    return {"message": "Chatbot API funcionando", "env": settings.APP_ENV}
+    """Endpoint de health check"""
+    return {
+        "message": "Chatbot RAG API funcionando",
+        "version": "1.0.0",
+        "env": settings.APP_ENV,
+        "features": [
+            "Multi-tenant bot management",
+            "RAG with ChromaDB",
+            "PDF, DOCX, TXT support",
+            "Analytics and metrics",
+            "Customizable prompts per bot"
+        ]
+    }
+
+
+@app.get("/health", tags=["Health"])
+def health():
+    """Endpoint detallado de health check"""
+    return {
+        "status": "healthy",
+        "llm_provider": settings.LLM_PROVIDER,
+        "version": "1.0.0"
+    }

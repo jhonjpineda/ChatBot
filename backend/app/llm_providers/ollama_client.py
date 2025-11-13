@@ -33,3 +33,29 @@ class OllamaClient:
             if msg:
                 chunks.append(msg)
         return "".join(chunks)
+
+    def chat_stream(self, messages: list[dict], *, temperature: float = 0.2):
+        """
+        Generador que yields chunks de texto en tiempo real para streaming.
+        Usado para respuestas progresivas en el frontend.
+        """
+        url = f"{self.base_url}/api/chat"
+        payload = {
+            "model": self.model,
+            "messages": messages,
+            "options": {"temperature": temperature},
+            "stream": True
+        }
+        resp = self.session.post(url, json=payload, stream=True)
+        resp.raise_for_status()
+
+        for line in resp.iter_lines(decode_unicode=True):
+            if not line:
+                continue
+            try:
+                obj = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            msg = obj.get("message", {}).get("content")
+            if msg:
+                yield msg

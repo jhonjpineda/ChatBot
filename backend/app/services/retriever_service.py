@@ -3,13 +3,14 @@ from app.services.vector_service import VectorService
 class RetrieverService:
     """
     Servicio que consulta en Chroma los chunks más parecidos.
-    Por ahora no filtramos por bot_id, pero el campo ya está en los metadatos.
+    Filtra resultados por bot_id para multi-tenancy.
     """
     def __init__(self):
         self.vector_service = VectorService()
 
     def search(self, query: str, bot_id: str):
-        results = self.vector_service.query(query_text=query, n_results=4)
+        # Ahora sí filtramos por bot_id para aislar cada chatbot
+        results = self.vector_service.query(query_text=query, n_results=4, bot_id=bot_id)
 
         # Chroma devuelve varias listas paralelas, las unimos
         documents = results.get("documents", [[]])[0]

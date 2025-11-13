@@ -11,3 +11,16 @@ class OpenAIClient:
             messages=messages
         )
         return resp.choices[0].message.content
+
+    def chat_stream(self, messages: list[dict]):
+        """
+        Generador que yields chunks de texto en tiempo real para streaming.
+        """
+        stream = self.client.chat.completions.create(
+            model=self.model,
+            messages=messages,
+            stream=True
+        )
+        for chunk in stream:
+            if chunk.choices[0].delta.content is not None:
+                yield chunk.choices[0].delta.content
