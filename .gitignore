@@ -8,3 +8,5 @@ __pycache__/
 Thumbs.db
 backend/.env
 backend/uploads/
+backend/chroma_db/
+.claude/settings.local.json
