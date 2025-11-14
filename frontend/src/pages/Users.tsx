@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { usersService, UserUpdateRequest } from '../services/users.service';
 import { usePermissions } from '../hooks/usePermissions';
-import { UserRole, User, RegisterRequest } from '../types/auth';
+import { UserRole, User, RegisterRequest } from '../types/index';
 
 export default function Users() {
   const queryClient = useQueryClient();

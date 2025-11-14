@@ -19,3 +19,6 @@ frontend/node_modules/
 # Backend data
 backend/analytics_data.json
 backend/bots_config.json
+
+# Windows special files
+nul
