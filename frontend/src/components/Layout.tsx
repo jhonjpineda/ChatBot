@@ -1,8 +1,9 @@
 import { useState, useRef, useEffect } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { usePermissions } from '../hooks/usePermissions';
 
-const navigation = [
+const baseNavigation = [
   { name: 'Dashboard', path: '/', icon: '📊' },
   { name: 'Bots', path: '/bots', icon: '🤖' },
   { name: 'Documentos', path: '/documents', icon: '📄' },
@@ -15,7 +16,14 @@ export default function Layout() {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const location = useLocation();
   const { user, logout } = useAuth();
+  const { canManageUsers } = usePermissions();
   const userMenuRef = useRef<HTMLDivElement>(null);
+
+  // Generar navegación dinámica basada en permisos
+  const navigation = [
+    ...baseNavigation,
+    ...(canManageUsers ? [{ name: 'Usuarios', path: '/users', icon: '👥' }] : []),
+  ];
 
   const isActive = (path: string) => {
     if (path === '/') return location.pathname === '/';

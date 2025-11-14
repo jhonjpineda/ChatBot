@@ -2,10 +2,12 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { documentsService } from '../services/documents.service';
 import { botsService } from '../services/bots.service';
-import type { Document } from '../types';
+import { usePermissions } from '../hooks/usePermissions';
+import type { Document } from '../types/index';
 
 export default function Documents() {
   const queryClient = useQueryClient();
+  const { canUploadDocuments, canDeleteDocuments, canAccessBot } = usePermissions();
   const [selectedBotId, setSelectedBotId] = useState<string>('default');
   const [dragActive, setDragActive] = useState(false);
   const [uploadProgress, setUploadProgress] = useState<{[key: string]: number}>({});
@@ -208,22 +210,23 @@ export default function Documents() {
       </div>
 
       {/* Upload Area */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">
-          Subir Documentos
-        </h2>
+      {canUploadDocuments ? (
+        <div className="bg-white rounded-lg shadow p-6">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">
+            Subir Documentos
+          </h2>
 
-        <div
-          onDragEnter={handleDrag}
-          onDragOver={handleDrag}
-          onDragLeave={handleDrag}
-          onDrop={handleDrop}
-          className={`relative border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
-            dragActive
-              ? 'border-primary-500 bg-primary-50'
-              : 'border-gray-300 hover:border-gray-400'
-          }`}
-        >
+          <div
+            onDragEnter={handleDrag}
+            onDragOver={handleDrag}
+            onDragLeave={handleDrag}
+            onDrop={handleDrop}
+            className={`relative border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
+              dragActive
+                ? 'border-primary-500 bg-primary-50'
+                : 'border-gray-300 hover:border-gray-400'
+            }`}
+          >
           <input
             type="file"
             id="file-upload"
@@ -261,7 +264,22 @@ export default function Documents() {
             ))}
           </div>
         )}
-      </div>
+        </div>
+      ) : (
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
+          <div className="flex items-center space-x-3">
+            <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            <div>
+              <h3 className="text-sm font-medium text-yellow-800">Sin permisos para subir documentos</h3>
+              <p className="text-sm text-yellow-700 mt-1">
+                Solo usuarios con rol Editor, Owner o Admin pueden subir documentos.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Documents List */}
       <div className="bg-white rounded-lg shadow">
@@ -342,25 +360,31 @@ export default function Documents() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
                       <div className="flex gap-3">
-                        <button
-                          onClick={() => handleMoveDocument(doc)}
-                          disabled={moveMutation.isPending || bots.length <= 1}
-                          className="text-blue-600 hover:text-blue-900 disabled:opacity-50 disabled:cursor-not-allowed"
-                          title={bots.length <= 1 ? 'Necesitas al menos 2 bots para mover documentos' : 'Mover a otro bot'}
-                        >
-                          Mover
-                        </button>
-                        <button
-                          onClick={() => {
-                            if (confirm(`¿Eliminar "${doc.filename}"?`)) {
-                              deleteMutation.mutate(doc.doc_id);
-                            }
-                          }}
-                          disabled={deleteMutation.isPending}
-                          className="text-red-600 hover:text-red-900 disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                          Eliminar
-                        </button>
+                        {canUploadDocuments && (
+                          <button
+                            onClick={() => handleMoveDocument(doc)}
+                            disabled={moveMutation.isPending || bots.length <= 1}
+                            className="text-blue-600 hover:text-blue-900 disabled:opacity-50 disabled:cursor-not-allowed"
+                            title={bots.length <= 1 ? 'Necesitas al menos 2 bots para mover documentos' : 'Mover a otro bot'}
+                          >
+                            Mover
+                          </button>
+                        )}
+                        {canDeleteDocuments ? (
+                          <button
+                            onClick={() => {
+                              if (confirm(`¿Eliminar "${doc.filename}"?`)) {
+                                deleteMutation.mutate(doc.doc_id);
+                              }
+                            }}
+                            disabled={deleteMutation.isPending}
+                            className="text-red-600 hover:text-red-900 disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            Eliminar
+                          </button>
+                        ) : (
+                          <span className="text-gray-400 text-sm italic">Sin permisos</span>
+                        )}
                       </div>
                     </td>
                   </tr>

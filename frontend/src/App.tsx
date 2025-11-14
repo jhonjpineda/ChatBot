@@ -8,6 +8,7 @@ import Bots from './pages/Bots';
 import Documents from './pages/Documents';
 import Analytics from './pages/Analytics';
 import ChatDemo from './pages/ChatDemo';
+import Users from './pages/Users';
 import Login from './pages/Login';
 import Register from './pages/Register';
 
@@ -45,6 +46,7 @@ function App() {
               <Route path="documents" element={<Documents />} />
               <Route path="analytics" element={<Analytics />} />
               <Route path="chat" element={<ChatDemo />} />
+              <Route path="users" element={<Users />} />
             </Route>
 
             {/* Ruta por defecto - redirigir a home */}
