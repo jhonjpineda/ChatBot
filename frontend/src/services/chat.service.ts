@@ -42,6 +42,8 @@ export const chatService = {
       throw new Error('No reader available');
     }
 
+    let buffer = '';
+
     try {
       while (true) {
         const { done, value } = await reader.read();
@@ -50,21 +52,32 @@ export const chatService = {
           break;
         }
 
-        const chunk = decoder.decode(value, { stream: true });
-        const lines = chunk.split('\n');
+        // Decodificar y agregar al buffer
+        buffer += decoder.decode(value, { stream: true });
+
+        // Procesar líneas completas
+        const lines = buffer.split('\n');
+
+        // Mantener la última línea incompleta en el buffer
+        buffer = lines.pop() || '';
 
         for (const line of lines) {
-          if (line.startsWith('data: ')) {
-            const data = JSON.parse(line.slice(6));
+          if (line.trim().startsWith('data: ')) {
+            try {
+              const jsonStr = line.trim().slice(6);
+              const data = JSON.parse(jsonStr);
 
-            if (data.type === 'metadata' && onMetadata) {
-              onMetadata(data);
-            } else if (data.type === 'chunk') {
-              onChunk(data.content);
-            } else if (data.type === 'error' && onError) {
-              onError(data.message);
-            } else if (data.type === 'done' && onDone) {
-              onDone();
+              if (data.type === 'metadata' && onMetadata) {
+                onMetadata(data);
+              } else if (data.type === 'chunk') {
+                onChunk(data.content);
+              } else if (data.type === 'error' && onError) {
+                onError(data.message);
+              } else if (data.type === 'done' && onDone) {
+                onDone();
+              }
+            } catch (e) {
+              console.error('Error parsing JSON:', e, 'Line:', line);
             }
           }
         }

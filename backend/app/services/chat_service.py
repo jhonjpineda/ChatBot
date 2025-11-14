@@ -30,8 +30,9 @@ class ChatService:
             if not bot_config or not bot_config.active:
                 raise ValueError(f"Bot {bot_id} no está disponible")
 
-            # 2. Buscar contexto relevante
-            context_chunks = self.retriever.search(user_question, bot_id)
+            # 2. Buscar contexto relevante usando retrieval_k del bot
+            k = bot_config.retrieval_k if hasattr(bot_config, 'retrieval_k') else 5
+            context_chunks = self.retriever.search(user_question, bot_id, k=k)
             context_text = "\n".join(c["text"] for c in context_chunks)
 
             # 3. Construir mensajes usando el prompt del bot
@@ -99,8 +100,9 @@ class ChatService:
             if not bot_config or not bot_config.active:
                 raise ValueError(f"Bot {bot_id} no está disponible")
 
-            # 2. Buscar contexto relevante
-            context_chunks = self.retriever.search(user_question, bot_id)
+            # 2. Buscar contexto relevante usando retrieval_k del bot
+            k = bot_config.retrieval_k if hasattr(bot_config, 'retrieval_k') else 5
+            context_chunks = self.retriever.search(user_question, bot_id, k=k)
             context_text = "\n".join(c["text"] for c in context_chunks)
 
             # 3. Enviar metadata inicial (fuentes y configuración del bot)

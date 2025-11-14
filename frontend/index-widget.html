@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Widget Dev - Chatbot</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+      line-height: 1.6;
+    }
+
+    h1 {
+      color: #333;
+    }
+
+    .info-box {
+      background: #f0f9ff;
+      border-left: 4px solid #3b82f6;
+      padding: 15px;
+      margin: 20px 0;
+    }
+
+    code {
+      background: #f3f4f6;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-family: 'Courier New', monospace;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>🤖 Widget Development Mode</h1>
+
+  <div class="info-box">
+    <p><strong>Modo Desarrollo Activo</strong></p>
+    <p>El widget se está sirviendo desde el dev server de Vite. Los cambios se reflejarán automáticamente.</p>
+  </div>
+
+  <h2>Prueba el Chatbot</h2>
+  <p>Mira la esquina inferior derecha. El widget debería aparecer ahí.</p>
+
+  <h3>Configuración Actual:</h3>
+  <ul>
+    <li><strong>Bot ID:</strong> <code>default</code></li>
+    <li><strong>API URL:</strong> <code>http://localhost:8000</code></li>
+    <li><strong>Color:</strong> <code>#3b82f6</code> (Azul)</li>
+    <li><strong>Posición:</strong> <code>bottom-right</code></li>
+  </ul>
+
+  <!-- Widget Container -->
+  <div id="chatbot-widget-root"></div>
+
+  <!-- En dev mode, cargamos el entry directamente -->
+  <script type="module">
+    import ChatbotWidget from '/src/widget-entry.tsx';
+
+    // Inicializar el widget
+    ChatbotWidget.init({
+      botId: 'default',
+      botName: 'Bot Principal',
+      apiBaseUrl: 'http://localhost:8000',
+      primaryColor: '#3b82f6',
+      position: 'bottom-right'
+    });
+  </script>
+</body>
+
+</html>

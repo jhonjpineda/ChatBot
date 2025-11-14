@@ -45,7 +45,8 @@ class DocumentService:
             text = self._extract_text_from_pdf(saved_path)  # fallback
 
         # 3. trocear en chunks con overlap
-        chunks = self._chunk_text(text, chunk_size=800, overlap=100)
+        # Chunks más pequeños (500) para mejor precisión semántica
+        chunks = self._chunk_text(text, chunk_size=500, overlap=100)
 
         # 4. generar embeddings y guardar en vector db
         doc_id = str(uuid.uuid4())

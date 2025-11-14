@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { analyticsService } from '../services/analytics.service';
 import { botsService } from '../services/bots.service';
-import type { BotAnalytics } from '../types';
+import WordCloud from '../components/WordCloud';
+import type { BotStats, GlobalStats } from '../types';
 
 export default function Analytics() {
   const [selectedBotId, setSelectedBotId] = useState<string>('');
@@ -21,14 +22,25 @@ export default function Analytics() {
     queryKey: ['analytics', selectedBotId || 'global', timeRange],
     queryFn: () =>
       selectedBotId
-        ? analyticsService.getBotAnalytics(selectedBotId)
-        : analyticsService.getGlobalAnalytics(),
+        ? analyticsService.getBotStats(selectedBotId, timeRange)
+        : analyticsService.getGlobalStats(timeRange),
   });
 
   // Fetch popular questions
   const { data: popularQuestions = [] } = useQuery({
     queryKey: ['popular-questions', selectedBotId],
     queryFn: () => analyticsService.getPopularQuestions(selectedBotId || undefined, 10),
+  });
+
+  // Fetch word cloud data
+  const { data: wordCloudData } = useQuery({
+    queryKey: ['word-cloud', selectedBotId, timeRange],
+    queryFn: () =>
+      analyticsService.getWordCloud({
+        bot_id: selectedBotId || undefined,
+        days: timeRange,
+        limit: 50,
+      }),
   });
 
   const formatNumber = (num: number) => {
@@ -86,7 +98,7 @@ export default function Analytics() {
             </select>
           </div>
 
-          {/* Time Range - Optional for future implementation */}
+          {/* Time Range */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Rango de Tiempo
@@ -95,14 +107,13 @@ export default function Analytics() {
               value={timeRange}
               onChange={(e) => setTimeRange(Number(e.target.value))}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-              disabled
             >
               <option value={7}>Últimos 7 días</option>
               <option value={30}>Últimos 30 días</option>
               <option value={90}>Últimos 90 días</option>
             </select>
             <p className="mt-1 text-xs text-gray-500">
-              (Filtro de tiempo próximamente)
+              Filtra la nube de palabras por período
             </p>
           </div>
         </div>
@@ -129,7 +140,7 @@ export default function Analytics() {
                     Total Interacciones
                   </p>
                   <p className="text-3xl font-bold text-gray-900 mt-2">
-                    {formatNumber(analytics.total_interactions)}
+                    {formatNumber(analytics.total_interactions || 0)}
                   </p>
                 </div>
                 <div className="text-4xl">💬</div>
@@ -137,18 +148,18 @@ export default function Analytics() {
             </div>
 
             {/* Success Rate */}
-            <div className={`rounded-lg shadow p-6 ${getSuccessRateBg(analytics.success_rate)}`}>
+            <div className={`rounded-lg shadow p-6 ${getSuccessRateBg(analytics.success_rate || 0)}`}>
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600">
                     Tasa de Éxito
                   </p>
-                  <p className={`text-3xl font-bold mt-2 ${getSuccessRateColor(analytics.success_rate)}`}>
-                    {analytics.success_rate.toFixed(1)}%
+                  <p className={`text-3xl font-bold mt-2 ${getSuccessRateColor(analytics.success_rate || 0)}`}>
+                    {(analytics.success_rate || 0).toFixed(1)}%
                   </p>
                 </div>
                 <div className="text-4xl">
-                  {analytics.success_rate >= 90 ? '✅' : analytics.success_rate >= 70 ? '⚠️' : '❌'}
+                  {(analytics.success_rate || 0) >= 90 ? '✅' : (analytics.success_rate || 0) >= 70 ? '⚠️' : '❌'}
                 </div>
               </div>
             </div>
@@ -161,30 +172,55 @@ export default function Analytics() {
                     Tiempo Promedio
                   </p>
                   <p className="text-3xl font-bold text-gray-900 mt-2">
-                    {formatDuration(analytics.avg_response_time_ms)}
+                    {formatDuration(analytics.avg_response_time_ms || 0)}
                   </p>
                 </div>
                 <div className="text-4xl">⚡</div>
               </div>
-              <div className="mt-2 text-xs text-gray-500">
-                Min: {formatDuration(analytics.min_response_time_ms)} |
-                Max: {formatDuration(analytics.max_response_time_ms)}
-              </div>
             </div>
 
-            {/* Total Errors */}
+            {/* Avg Sources */}
             <div className="bg-white rounded-lg shadow p-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600">
-                    Total Errores
+                    Fuentes Promedio
                   </p>
-                  <p className="text-3xl font-bold text-red-600 mt-2">
-                    {formatNumber(analytics.total_errors)}
+                  <p className="text-3xl font-bold text-blue-600 mt-2">
+                    {analytics.avg_sources_count?.toFixed(1) || '0.0'}
                   </p>
                 </div>
-                <div className="text-4xl">🚨</div>
+                <div className="text-4xl">📚</div>
               </div>
+            </div>
+          </div>
+
+          {/* Word Cloud Section */}
+          <div className="bg-white rounded-lg shadow">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-lg font-semibold text-gray-900">
+                    Nube de Palabras
+                  </h2>
+                  <p className="text-sm text-gray-600 mt-1">
+                    Palabras más frecuentes en las preguntas de los usuarios
+                  </p>
+                </div>
+                {wordCloudData?.word_cloud && wordCloudData.word_cloud.length > 0 && (
+                  <div className="text-sm text-gray-500">
+                    {wordCloudData.total_words} palabras únicas
+                  </div>
+                )}
+              </div>
+            </div>
+            <div className="p-6">
+              <WordCloud
+                words={wordCloudData?.word_cloud || []}
+                maxWords={50}
+                minFontSize={14}
+                maxFontSize={48}
+              />
             </div>
           </div>
 
@@ -206,54 +242,23 @@ export default function Analytics() {
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Interacciones
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Éxitos
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Errores
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Tasa Éxito
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Tiempo Prom.
-                      </th>
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
-                    {analytics.daily_breakdown.map((day: any) => {
-                      const successRate = day.count > 0
-                        ? ((day.count - day.errors) / day.count) * 100
-                        : 0;
-                      return (
-                        <tr key={day.date} className="hover:bg-gray-50">
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            {new Date(day.date).toLocaleDateString('es-ES', {
-                              year: 'numeric',
-                              month: 'short',
-                              day: 'numeric',
-                            })}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            {formatNumber(day.count)}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-green-600">
-                            {formatNumber(day.count - day.errors)}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-red-600">
-                            {formatNumber(day.errors)}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm">
-                            <span className={getSuccessRateColor(successRate)}>
-                              {successRate.toFixed(1)}%
-                            </span>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            {formatDuration(day.avg_response_time)}
-                          </td>
-                        </tr>
-                      );
-                    })}
+                    {analytics.daily_breakdown.map((day: any) => (
+                      <tr key={day.date} className="hover:bg-gray-50">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {new Date(day.date).toLocaleDateString('es-ES', {
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric',
+                          })}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {formatNumber(day.count)}
+                        </td>
+                      </tr>
+                    ))}
                   </tbody>
                 </table>
               </div>

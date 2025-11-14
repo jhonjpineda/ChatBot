@@ -8,9 +8,10 @@ class RetrieverService:
     def __init__(self):
         self.vector_service = VectorService()
 
-    def search(self, query: str, bot_id: str):
+    def search(self, query: str, bot_id: str, k: int = 5):
         # Ahora sí filtramos por bot_id para aislar cada chatbot
-        results = self.vector_service.query(query_text=query, n_results=4, bot_id=bot_id)
+        # k es configurable por bot (retrieval_k en bots_config.json)
+        results = self.vector_service.query(query_text=query, n_results=k, bot_id=bot_id)
 
         # Chroma devuelve varias listas paralelas, las unimos
         documents = results.get("documents", [[]])[0]

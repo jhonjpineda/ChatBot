@@ -20,7 +20,7 @@ export default function ChatDemo() {
 
   const embedCode = `<!-- Chatbot Widget -->
 <div id="chatbot-widget-root"></div>
-<script src="http://localhost:5176/widget.js"></script>
+<script src="https://tu-cdn.com/widget.iife.js"></script>
 <script>
   ChatbotWidget.init({
     botId: '${selectedBotId}',
@@ -120,15 +120,16 @@ export default function ChatDemo() {
           </button>
         </div>
 
-        <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+        <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
           <div className="flex gap-2">
-            <span className="text-yellow-600">⚠️</span>
-            <div className="text-sm text-yellow-800">
-              <p className="font-medium">Nota importante:</p>
-              <p className="mt-1">
-                El archivo <code className="bg-yellow-100 px-1 rounded">widget.js</code> aún no está implementado.
-                Por ahora, puedes usar el widget directamente en aplicaciones React importando el componente ChatWidget.
-              </p>
+            <span className="text-blue-600">ℹ️</span>
+            <div className="text-sm text-blue-800">
+              <p className="font-medium">Cómo usar el widget:</p>
+              <div className="mt-1 space-y-1">
+                <p>1. <strong>Desarrollo:</strong> Ejecuta <code className="bg-blue-100 px-1 rounded">npm run widget:dev</code> y abre <code className="bg-blue-100 px-1 rounded">http://localhost:5176/index-widget.html</code></p>
+                <p>2. <strong>Producción:</strong> Ejecuta <code className="bg-blue-100 px-1 rounded">npm run widget:build</code> y despliega <code className="bg-blue-100 px-1 rounded">dist-widget/widget.iife.js</code> a tu CDN</p>
+                <p>3. Ver documentación completa en <code className="bg-blue-100 px-1 rounded">frontend/WIDGET_README.md</code></p>
+              </div>
             </div>
           </div>
         </div>

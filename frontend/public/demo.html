@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Demo - Chatbot Widget</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+      line-height: 1.6;
+    }
+
+    h1 {
+      color: #333;
+    }
+
+    .info-box {
+      background: #f0f9ff;
+      border-left: 4px solid #3b82f6;
+      padding: 15px;
+      margin: 20px 0;
+    }
+
+    code {
+      background: #f3f4f6;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-family: 'Courier New', monospace;
+    }
+
+    pre {
+      background: #1f2937;
+      color: #f3f4f6;
+      padding: 15px;
+      border-radius: 6px;
+      overflow-x: auto;
+    }
+
+    pre code {
+      background: transparent;
+      color: inherit;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>🤖 Demo del Chatbot Widget</h1>
+
+  <div class="info-box">
+    <p><strong>¡El chatbot está activo!</strong></p>
+    <p>Mira la esquina inferior derecha de la página. Haz clic en el botón azul para abrir el chat.</p>
+  </div>
+
+  <h2>¿Cómo integrar este widget en tu sitio web?</h2>
+
+  <p>Solo necesitas agregar este código HTML en cualquier página:</p>
+
+  <pre><code>&lt;!-- 1. Contenedor del widget --&gt;
+&lt;div id="chatbot-widget-root"&gt;&lt;/div&gt;
+
+&lt;!-- 2. Script del widget --&gt;
+&lt;script src="http://localhost:5176/widget.js"&gt;&lt;/script&gt;
+
+&lt;!-- 3. Inicialización --&gt;
+&lt;script&gt;
+  ChatbotWidget.init({
+    botId: 'default',           // ID del bot a usar
+    botName: 'Bot Principal',   // Nombre a mostrar
+    apiBaseUrl: 'http://localhost:8000',  // URL del backend
+    primaryColor: '#3b82f6',    // Color principal (azul)
+    position: 'bottom-right'    // Posición: 'bottom-right' o 'bottom-left'
+  });
+&lt;/script&gt;</code></pre>
+
+  <h2>Características</h2>
+  <ul>
+    <li>✅ <strong>Streaming en tiempo real</strong> - Las respuestas aparecen palabra por palabra</li>
+    <li>✅ <strong>RAG (Retrieval-Augmented Generation)</strong> - Responde basándose en tus documentos</li>
+    <li>✅ <strong>Personalizable</strong> - Cambia colores, posición y configuración</li>
+    <li>✅ <strong>Multi-bot</strong> - Usa diferentes bots según tus necesidades</li>
+    <li>✅ <strong>Responsive</strong> - Funciona en desktop y móvil</li>
+  </ul>
+
+  <h2>Personalización</h2>
+
+  <h3>Cambiar color</h3>
+  <pre><code>ChatbotWidget.init({
+  botId: 'default',
+  primaryColor: '#10b981',  // Verde
+  // ... otras opciones
+});</code></pre>
+
+  <h3>Posición izquierda</h3>
+  <pre><code>ChatbotWidget.init({
+  botId: 'default',
+  position: 'bottom-left',  // Esquina inferior izquierda
+  // ... otras opciones
+});</code></pre>
+
+  <h3>Usar diferente bot</h3>
+  <pre><code>ChatbotWidget.init({
+  botId: 'soporte',
+  botName: 'Soporte Técnico',
+  // ... otras opciones
+});</code></pre>
+
+  <!-- ==================== WIDGET ==================== -->
+  <div id="chatbot-widget-root"></div>
+
+  <!-- Para PRODUCCIÓN: usa el widget.js compilado -->
+  <script src="./widget.iife.js"></script>
+
+  <script>
+    ChatbotWidget.init({
+      botId: 'default',
+      botName: 'Bot Principal',
+      apiBaseUrl: 'http://localhost:8000',
+      primaryColor: '#3b82f6',
+      position: 'bottom-right'
+    });
+  </script>
+  <!-- ================================================ -->
+
+</body>
+
+</html>

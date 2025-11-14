@@ -2,14 +2,27 @@
   {
     "bot_id": "default",
     "name": "Bot Principal",
-    "description": "Bot de propósito general con RAG estricto",
-    "system_prompt": "Eres un asistente inteligente que responde preguntas utilizando principalmente la información del contexto proporcionado. Si el contexto no tiene información completa, puedes complementar con conocimiento general, pero siempre indica qué información viene del contexto y cuál es complementaria.",
-    "temperature": 0.7,
+    "description": "Bot con RAG estricto - solo responde del contexto",
+    "system_prompt": "Eres un chatbot que responde preguntas basándose ÚNICAMENTE en la información proporcionada en el contexto.\nSi la información no está en el contexto, responde: \"No tengo información sobre eso en mi base de conocimiento.\"\nSé preciso, conciso y cita las fuentes cuando sea posible.",
+    "temperature": 0.2,
     "max_tokens": null,
-    "retrieval_k": 4,
+    "retrieval_k": 5,
     "active": true,
     "created_at": "2025-11-13T11:02:41.957533",
-    "updated_at": "2025-11-13T11:02:41.957533",
+    "updated_at": "2025-11-13T18:48:28.057141",
     "metadata": null
+  },
+  {
+    "bot_id": "SoporteTech",
+    "name": "SoporteTech",
+    "description": "SoporteTech",
+    "system_prompt": "Eres un asistente de soporte técnico profesional y amigable.\n\nResponde SIEMPRE basándote en la documentación proporcionada en el contexto.\nCuando el contexto contenga la información solicitada, úsala EXACTAMENTE como aparece.\nProporciona instrucciones paso a paso cuando sea necesario.\nSi encuentras URLs o enlaces en el contexto, compártelos textualmente.\nSi el problema requiere intervención humana, indica: \"Te recomiendo contactar con nuestro equipo de soporte.\"\nMantén un tono empático y profesional.",
+    "temperature": 0.3,
+    "max_tokens": null,
+    "retrieval_k": 7,
+    "active": true,
+    "created_at": "2025-11-13T19:25:49.777819",
+    "updated_at": "2025-11-13T19:25:49.777819",
+    "metadata": {}
   }
 ]

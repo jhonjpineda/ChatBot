@@ -39,4 +39,24 @@ export const analyticsService = {
     });
     return response.data;
   },
+
+  // Nube de palabras
+  getWordCloud: async (params?: { bot_id?: string; days?: number; limit?: number }) => {
+    const response = await api.get('/analytics/word-cloud', { params });
+    return response.data;
+  },
+
+  // Análisis de temas
+  getQuestionTopics: async (params?: { bot_id?: string; days?: number }) => {
+    const response = await api.get('/analytics/question-topics', { params });
+    return response.data;
+  },
+
+  // Uso de documentos
+  getDocumentUsage: async (botId: string, days?: number) => {
+    const response = await api.get(`/analytics/document-usage/${botId}`, {
+      params: { days },
+    });
+    return response.data;
+  },
 };

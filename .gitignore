@@ -10,3 +10,12 @@ backend/.env
 backend/uploads/
 backend/chroma_db/
 .claude/settings.local.json
+
+# Frontend builds
+frontend/dist/
+frontend/dist-widget/
+frontend/node_modules/
+
+# Backend data
+backend/analytics_data.json
+backend/bots_config.json

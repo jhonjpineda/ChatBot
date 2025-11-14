@@ -1,8 +1,9 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Query
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
 from app.services.chat_service import get_chat_service
+from app.services.retriever_service import RetrieverService
 
 router = APIRouter()
 
@@ -33,3 +34,30 @@ def chat_stream_endpoint(payload: ChatRequest):
             "X-Accel-Buffering": "no"  # Desactivar buffering en nginx
         }
     )
+
+@router.get("/debug-retrieval")
+def debug_retrieval(
+    query: str = Query(..., description="Pregunta a buscar"),
+    bot_id: str = Query(default="default", description="ID del bot")
+):
+    """
+    Endpoint temporal para debuggear el retrieval.
+    Muestra qué chunks se recuperan para una pregunta.
+    """
+    retriever = RetrieverService()
+    results = retriever.search(query, bot_id=bot_id)
+
+    return {
+        "query": query,
+        "bot_id": bot_id,
+        "total_chunks": len(results),
+        "chunks": [
+            {
+                "text_preview": chunk["text"][:300] + "...",
+                "full_text": chunk["text"],
+                "metadata": chunk.get("metadata", {}),
+                "distance_score": chunk.get("score")
+            }
+            for chunk in results
+        ]
+    }

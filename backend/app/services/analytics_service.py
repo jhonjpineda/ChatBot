@@ -1,11 +1,29 @@
 import json
 import os
+import re
 from datetime import datetime, timedelta
 from typing import List, Dict, Optional
-from collections import defaultdict
+from collections import defaultdict, Counter
 
 
 ANALYTICS_FILE = "analytics_data.json"
+
+# Palabras comunes a filtrar (stop words en español)
+STOP_WORDS = {
+    'el', 'la', 'de', 'que', 'y', 'a', 'en', 'un', 'ser', 'se', 'no', 'haber',
+    'por', 'con', 'su', 'para', 'como', 'estar', 'tener', 'le', 'lo', 'todo',
+    'pero', 'más', 'hacer', 'o', 'poder', 'decir', 'este', 'ir', 'otro', 'ese',
+    'la', 'si', 'me', 'ya', 'ver', 'porque', 'dar', 'cuando', 'él', 'muy',
+    'sin', 'vez', 'mucho', 'saber', 'qué', 'sobre', 'mi', 'alguno', 'mismo',
+    'yo', 'también', 'hasta', 'año', 'dos', 'querer', 'entre', 'así', 'primero',
+    'desde', 'grande', 'eso', 'ni', 'nos', 'llegar', 'pasar', 'tiempo', 'ella',
+    'sí', 'día', 'uno', 'bien', 'poco', 'deber', 'entonces', 'poner', 'cosa',
+    'tanto', 'hombre', 'parecer', 'nuestro', 'tan', 'donde', 'ahora', 'parte',
+    'después', 'vida', 'quedar', 'siempre', 'creer', 'hablar', 'llevar', 'dejar',
+    'es', 'son', 'fue', 'está', 'hay', 'tiene', 'del', 'al', 'los', 'las',
+    'una', 'unos', 'unas', 'puede', 'pueden', 'cuál', 'cuáles', 'cómo', 'cuánto',
+    'cuántos', 'cuánta', 'cuántas', 'dónde'
+}
 
 
 class AnalyticsService:
@@ -217,3 +235,123 @@ class AnalyticsService:
 
         self._save_data(data)
         print(f"🧹 Datos anteriores a {days_to_keep} días eliminados")
+
+    def _extract_keywords(self, text: str) -> List[str]:
+        """
+        Extrae palabras clave de un texto.
+        Filtra stop words y palabras muy cortas.
+        """
+        # Convertir a minúsculas y extraer palabras
+        text = text.lower()
+        # Remover caracteres especiales, mantener solo letras y números
+        words = re.findall(r'\b[a-záéíóúñü]{3,}\b', text)
+
+        # Filtrar stop words
+        keywords = [word for word in words if word not in STOP_WORDS]
+
+        return keywords
+
+    def get_word_cloud_data(self, bot_id: Optional[str] = None, days: int = 30, limit: int = 50) -> List[Dict]:
+        """
+        Obtiene datos para nube de palabras basada en las preguntas.
+        Retorna lista de {word: str, count: int, weight: float}
+        """
+        data = self._load_data()
+        cutoff_date = datetime.now() - timedelta(days=days)
+
+        # Filtrar interacciones
+        interactions = [
+            i for i in data["interactions"]
+            if datetime.fromisoformat(i["timestamp"]) > cutoff_date
+        ]
+
+        if bot_id:
+            interactions = [i for i in interactions if i["bot_id"] == bot_id]
+
+        # Extraer todas las palabras de las preguntas
+        all_keywords = []
+        for interaction in interactions:
+            keywords = self._extract_keywords(interaction["question"])
+            all_keywords.extend(keywords)
+
+        # Contar frecuencias
+        word_counts = Counter(all_keywords)
+
+        # Obtener las top N palabras
+        top_words = word_counts.most_common(limit)
+
+        # Calcular peso normalizado (0-1) para visualización
+        if top_words:
+            max_count = top_words[0][1]
+            return [
+                {
+                    "word": word,
+                    "count": count,
+                    "weight": count / max_count  # Normalizado entre 0 y 1
+                }
+                for word, count in top_words
+            ]
+
+        return []
+
+    def get_question_topics(self, bot_id: Optional[str] = None, days: int = 30) -> Dict:
+        """
+        Analiza los temas principales de las preguntas.
+        Agrupa palabras relacionadas y calcula su frecuencia.
+        """
+        word_cloud = self.get_word_cloud_data(bot_id, days, limit=100)
+
+        # Categorizar palabras por frecuencia
+        total_words = sum(w["count"] for w in word_cloud)
+
+        categories = {
+            "muy_frecuente": [],  # > 5% del total
+            "frecuente": [],      # 2-5%
+            "ocasional": []       # < 2%
+        }
+
+        for word_data in word_cloud:
+            percentage = (word_data["count"] / total_words * 100) if total_words > 0 else 0
+
+            if percentage > 5:
+                categories["muy_frecuente"].append({**word_data, "percentage": percentage})
+            elif percentage > 2:
+                categories["frecuente"].append({**word_data, "percentage": percentage})
+            else:
+                categories["ocasional"].append({**word_data, "percentage": percentage})
+
+        return {
+            "total_unique_words": len(word_cloud),
+            "total_words_analyzed": total_words,
+            "categories": categories
+        }
+
+    def get_document_usage_stats(self, bot_id: str, days: int = 30) -> List[Dict]:
+        """
+        Analiza qué documentos se están usando más en las respuestas.
+        Requiere acceso al vector service para identificar fuentes.
+        """
+        # Por ahora retornamos stats básicas
+        # En el futuro se puede integrar con metadata de chunks
+        data = self._load_data()
+        cutoff_date = datetime.now() - timedelta(days=days)
+
+        interactions = [
+            i for i in data["interactions"]
+            if i["bot_id"] == bot_id and datetime.fromisoformat(i["timestamp"]) > cutoff_date
+        ]
+
+        if not interactions:
+            return []
+
+        # Calcular estadísticas básicas
+        avg_sources = sum(i["sources_count"] for i in interactions) / len(interactions)
+
+        return {
+            "bot_id": bot_id,
+            "period_days": days,
+            "total_queries": len(interactions),
+            "avg_sources_per_query": round(avg_sources, 2),
+            "queries_with_sources": sum(1 for i in interactions if i["sources_count"] > 0),
+            "queries_without_sources": sum(1 for i in interactions if i["sources_count"] == 0)
+        }
