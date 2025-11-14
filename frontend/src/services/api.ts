@@ -10,12 +10,13 @@ export const api = axios.create({
   },
 });
 
-// Request interceptor para agregar token si existe
+// Request interceptor para agregar token JWT
 api.interceptors.request.use(
   (config) => {
-    // Aquí podrías agregar autenticación en el futuro
-    // const token = localStorage.getItem('token');
-    // if (token) config.headers.Authorization = `Bearer ${token}`;
+    const token = localStorage.getItem('chatbot_token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
     return config;
   },
   (error) => Promise.reject(error)
@@ -27,6 +28,18 @@ api.interceptors.response.use(
   (error) => {
     if (error.response) {
       console.error('API Error:', error.response.data);
+
+      // Si es 401 (no autenticado), limpiar sesión y redirigir a login
+      if (error.response.status === 401) {
+        localStorage.removeItem('chatbot_token');
+        localStorage.removeItem('chatbot_user');
+
+        // Solo redirigir si no estamos ya en login/register
+        if (!window.location.pathname.includes('/login') &&
+            !window.location.pathname.includes('/register')) {
+          window.location.href = '/login';
+        }
+      }
     } else if (error.request) {
       console.error('Network Error:', error.message);
     }
