@@ -1,5 +1,5 @@
 import api from './api';
-import type { Document } from '../types';
+import type { Document } from '../types/index';
 
 export const documentsService = {
   // Subir un documento

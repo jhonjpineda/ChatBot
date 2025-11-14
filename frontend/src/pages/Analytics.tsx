@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { analyticsService } from '../services/analytics.service';
 import { botsService } from '../services/bots.service';
 import WordCloud from '../components/WordCloud';
-import type { BotStats, GlobalStats } from '../types';
+import type { BotStats, GlobalStats } from '../types/index';
 
 export default function Analytics() {
   const [selectedBotId, setSelectedBotId] = useState<string>('');

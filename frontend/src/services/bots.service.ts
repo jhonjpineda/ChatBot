@@ -1,5 +1,5 @@
 import api from './api';
-import type { Bot, BotCreate, BotUpdate } from '../types';
+import type { Bot, BotCreate, BotUpdate } from '../types/index';
 
 export const botsService = {
   // Listar todos los bots

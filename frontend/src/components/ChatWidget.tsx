@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { chatService } from '../services/chat.service';
-import type { ChatMessage } from '../types';
+import type { ChatMessage } from '../types/index';
 
 interface ChatWidgetProps {
   botId: string;
