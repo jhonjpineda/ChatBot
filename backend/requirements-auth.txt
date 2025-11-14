@@ -1,0 +1,11 @@
+# Dependencias adicionales para el sistema de autenticación
+# Instalar con: pip install -r requirements-auth.txt
+
+# JWT y criptografía
+python-jose[cryptography]==3.3.0
+
+# Hashing de contraseñas con bcrypt
+passlib[bcrypt]==1.7.4
+
+# Para manejo de formularios multipart (opcional pero recomendado)
+python-multipart==0.0.6

@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
-from app.api import chat, documents, bots, analytics
+from app.api import chat, documents, bots, analytics, auth
 
 app = FastAPI(
     title=settings.APP_NAME,
@@ -23,6 +23,7 @@ app.add_middleware(
 )
 
 # Rutas principales
+app.include_router(auth.router, prefix="/auth", tags=["Authentication"])
 app.include_router(chat.router, prefix="/chat", tags=["Chat"])
 app.include_router(documents.router, prefix="/documents", tags=["Documents"])
 app.include_router(bots.router, prefix="/bots", tags=["Bots"])
@@ -37,11 +38,13 @@ def root():
         "version": "1.0.0",
         "env": settings.APP_ENV,
         "features": [
+            "JWT Authentication & Authorization",
             "Multi-tenant bot management",
             "RAG with ChromaDB",
             "PDF, DOCX, TXT support",
             "Analytics and metrics",
-            "Customizable prompts per bot"
+            "Customizable prompts per bot",
+            "Role-based access control (RBAC)"
         ]
     }
 
