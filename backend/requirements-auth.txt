@@ -9,3 +9,6 @@ passlib[bcrypt]==1.7.4
 
 # Para manejo de formularios multipart (opcional pero recomendado)
 python-multipart==0.0.6
+
+# Validación de emails en Pydantic
+pydantic[email]>=2.0.0
