@@ -1,5 +1,5 @@
 import api from './api';
-import type { BotStats, GlobalStats, PopularQuestion } from '../types';
+import type { BotStats, GlobalStats, PopularQuestion } from '../types/index';
 
 export const analyticsService = {
   // Obtener estadísticas de un bot

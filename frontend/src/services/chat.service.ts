@@ -1,5 +1,5 @@
 import api from './api';
-import type { ChatResponse } from '../types';
+import type { ChatResponse } from '../types/index';
 
 export const chatService = {
   // Enviar mensaje al bot (sin streaming)
