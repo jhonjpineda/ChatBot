@@ -5,9 +5,9 @@ Gestiona usuarios en users.json.
 import os
 import json
 import uuid
+import bcrypt
 from datetime import datetime, timedelta
 from typing import Optional, List
-from passlib.context import CryptContext
 from jose import JWTError, jwt
 
 from app.models.user import User, UserCreate, UserLogin, UserUpdate, UserResponse, TokenData, UserRole
@@ -16,8 +16,6 @@ from app.models.user import User, UserCreate, UserLogin, UserUpdate, UserRespons
 SECRET_KEY = os.getenv("JWT_SECRET_KEY", "tu-clave-secreta-super-segura-cambiar-en-produccion")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7  # 7 días
-
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 USERS_FILE = "users.json"
 
@@ -71,12 +69,14 @@ class AuthService:
             }, f, indent=2, default=str)
 
     def _hash_password(self, password: str) -> str:
-        """Hashea una contraseña"""
-        return pwd_context.hash(password)
+        """Hashea una contraseña usando bcrypt directamente"""
+        salt = bcrypt.gensalt()
+        hashed = bcrypt.hashpw(password.encode('utf-8'), salt)
+        return hashed.decode('utf-8')
 
     def _verify_password(self, plain_password: str, hashed_password: str) -> bool:
-        """Verifica una contraseña"""
-        return pwd_context.verify(plain_password, hashed_password)
+        """Verifica una contraseña usando bcrypt directamente"""
+        return bcrypt.checkpw(plain_password.encode('utf-8'), hashed_password.encode('utf-8'))
 
     def create_access_token(self, user: User) -> str:
         """Crea un JWT token"""
