@@ -1,11 +1,15 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { AuthProvider } from './contexts/AuthContext';
+import PrivateRoute from './components/PrivateRoute';
 import Layout from './components/Layout';
 import Dashboard from './pages/Dashboard';
 import Bots from './pages/Bots';
 import Documents from './pages/Documents';
 import Analytics from './pages/Analytics';
 import ChatDemo from './pages/ChatDemo';
+import Login from './pages/Login';
+import Register from './pages/Register';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -21,15 +25,32 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Layout />}>
-            <Route index element={<Dashboard />} />
-            <Route path="bots" element={<Bots />} />
-            <Route path="documents" element={<Documents />} />
-            <Route path="analytics" element={<Analytics />} />
-            <Route path="chat" element={<ChatDemo />} />
-          </Route>
-        </Routes>
+        <AuthProvider>
+          <Routes>
+            {/* Rutas públicas */}
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+
+            {/* Rutas protegidas */}
+            <Route
+              path="/"
+              element={
+                <PrivateRoute>
+                  <Layout />
+                </PrivateRoute>
+              }
+            >
+              <Route index element={<Dashboard />} />
+              <Route path="bots" element={<Bots />} />
+              <Route path="documents" element={<Documents />} />
+              <Route path="analytics" element={<Analytics />} />
+              <Route path="chat" element={<ChatDemo />} />
+            </Route>
+
+            {/* Ruta por defecto - redirigir a home */}
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </AuthProvider>
       </BrowserRouter>
     </QueryClientProvider>
   );
