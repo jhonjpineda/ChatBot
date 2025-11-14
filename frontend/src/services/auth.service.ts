@@ -1,5 +1,5 @@
 import { api } from './api';
-import { LoginRequest, RegisterRequest, AuthResponse, User } from '../types';
+import type { LoginRequest, RegisterRequest, AuthResponse, User } from '../types/index';
 
 class AuthService {
   private readonly TOKEN_KEY = 'chatbot_token';
