@@ -1,0 +1,16 @@
+{
+  "users": [
+    {
+      "user_id": "e867554b-0d92-4551-9430-62453913daf7",
+      "email": "admin@chatbot.com",
+      "username": "Admin",
+      "hashed_password": "$2b$12$EpC1dUxd1Yljr1jmYCnwIuHNsqcHyoJpVAcPpZziM/NfUbX3TtazS",
+      "role": "admin",
+      "organization_id": null,
+      "active": true,
+      "created_at": "2025-11-14 16:44:44.231283",
+      "updated_at": "2025-11-14 16:44:44.233370",
+      "allowed_bots": null
+    }
+  ]
+}
