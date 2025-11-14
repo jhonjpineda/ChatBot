@@ -1,13 +1,15 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { botsService } from '../services/bots.service';
-import type { Bot, BotCreate } from '../types';
+import { usePermissions } from '../hooks/usePermissions';
+import type { Bot, BotCreate } from '../types/index';
 
 export default function Bots() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editingBot, setEditingBot] = useState<Bot | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
   const queryClient = useQueryClient();
+  const { canCreateBots, canEditBot, canDeleteBot } = usePermissions();
 
   const { data, isLoading } = useQuery({
     queryKey: ['bots'],
@@ -62,12 +64,14 @@ export default function Bots() {
             Crea y configura tus chatbots con IA
           </p>
         </div>
-        <button
-          onClick={() => setShowCreateModal(true)}
-          className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium"
-        >
-          + Crear Bot
-        </button>
+        {canCreateBots && (
+          <button
+            onClick={() => setShowCreateModal(true)}
+            className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium"
+          >
+            + Crear Bot
+          </button>
+        )}
       </div>
 
       {/* Bots Grid */}
@@ -102,19 +106,23 @@ export default function Bots() {
             </div>
 
             <div className="mt-4 flex items-center space-x-2">
-              <button
-                onClick={() => setEditingBot(bot)}
-                className="flex-1 px-3 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
-              >
-                Editar
-              </button>
-              <button
-                onClick={() => setShowDeleteConfirm(bot.bot_id)}
-                disabled={bot.bot_id === 'default'}
-                className="flex-1 px-3 py-2 text-sm bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Eliminar
-              </button>
+              {canEditBot(bot.bot_id) && (
+                <button
+                  onClick={() => setEditingBot(bot)}
+                  className="flex-1 px-3 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                >
+                  Editar
+                </button>
+              )}
+              {canDeleteBot(bot.bot_id) && (
+                <button
+                  onClick={() => setShowDeleteConfirm(bot.bot_id)}
+                  disabled={bot.bot_id === 'default'}
+                  className="flex-1 px-3 py-2 text-sm bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Eliminar
+                </button>
+              )}
             </div>
           </div>
         ))}
