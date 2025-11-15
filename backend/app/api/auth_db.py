@@ -270,10 +270,17 @@ async def list_pending_users(
     pending_users = auth_service.get_pending_users(organization_id=organization_id)
 
     # Calcular horas de espera
-    now = datetime.utcnow()
+    from datetime import timezone
+    now = datetime.now(timezone.utc)
     result = []
     for user in pending_users:
-        hours_waiting = (now - user.created_at).total_seconds() / 3600
+        # Manejar timezone-aware/naive datetimes
+        user_created = user.created_at
+        if user_created.tzinfo is None:
+            # Si es naive, asumir UTC
+            from datetime import timezone
+            user_created = user_created.replace(tzinfo=timezone.utc)
+        hours_waiting = (now - user_created).total_seconds() / 3600
         result.append(
             PendingUserResponse(
                 user_id=user.user_id,
