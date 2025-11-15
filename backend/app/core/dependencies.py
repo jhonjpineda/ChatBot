@@ -138,7 +138,7 @@ def get_current_user_db(
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    user = auth_service.get_user_by_id(token_data.user_id)
+    user = auth_service.get_user_by_id(token_data['sub'])
 
     if user is None:
         raise HTTPException(
