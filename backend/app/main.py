@@ -2,7 +2,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
-from app.api import chat, documents, bots, analytics, auth
+from app.api import chat, documents, bots, analytics
+from app.api import auth_db as auth  # Usar PostgreSQL
 
 app = FastAPI(
     title=settings.APP_NAME,

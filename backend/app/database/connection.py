@@ -55,5 +55,7 @@ def init_db():
     Se ejecuta al iniciar la aplicación.
     """
     from app.database.base import Base
+    # Importar todos los modelos para que SQLAlchemy los registre
+    from app.database import models  # noqa: F401
     Base.metadata.create_all(bind=engine)
     print("✅ Tablas de base de datos creadas exitosamente")

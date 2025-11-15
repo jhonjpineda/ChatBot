@@ -2,8 +2,11 @@
 
 from functools import lru_cache
 from pydantic_settings import BaseSettings
+from pydantic import ConfigDict
 
 class Settings(BaseSettings):
+    model_config = ConfigDict(extra='allow', env_file='.env', env_file_encoding='utf-8')
+
     APP_NAME: str = "Chatbot RAG"
     APP_ENV: str = "development"
     APP_HOST: str = "0.0.0.0"
@@ -20,9 +23,17 @@ class Settings(BaseSettings):
     OPENAI_API_KEY: str = ""
     OPENAI_MODEL: str = "gpt-4o-mini"
 
-    class Config:
-        env_file = ".env"
-        env_file_encoding = "utf-8"
+    # PostgreSQL
+    DATABASE_URL: str = ""
+    USE_DATABASE: bool = False
+
+    # JWT
+    JWT_SECRET_KEY: str = "dev-secret-key"
+    JWT_ALGORITHM: str = "HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 10080
+
+    # CORS
+    ALLOWED_ORIGINS: str = "http://localhost:5173"
 
 
 @lru_cache
