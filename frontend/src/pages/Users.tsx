@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { usersService, UserUpdateRequest } from '../services/users.service';
+import { usersService } from '../services/users.service';
+import type { UserUpdateRequest } from '../services/users.service';
 import { usePermissions } from '../hooks/usePermissions';
-import { UserRole, User, RegisterRequest } from '../types/index';
+import { UserRole } from '../types/index';
+import type { UserRoleType, User, RegisterRequest } from '../types/index';
 
 export default function Users() {
   const queryClient = useQueryClient();
@@ -355,7 +357,7 @@ function CreateUserModal({ onClose, onSubmit, isLoading, isAdmin }: CreateUserMo
             <label className="block text-sm font-medium text-gray-700 mb-1">Rol</label>
             <select
               value={formData.role}
-              onChange={(e) => setFormData({ ...formData, role: e.target.value as UserRole })}
+              onChange={(e) => setFormData({ ...formData, role: e.target.value as UserRoleType })}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
             >
               <option value={UserRole.VIEWER}>Visualizador</option>

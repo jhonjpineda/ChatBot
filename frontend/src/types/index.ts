@@ -96,5 +96,44 @@ export interface PopularQuestion {
   avg_response_time_ms: number;
 }
 
-// Auth Types - Re-exportados desde auth.ts
-export { UserRole, type User, type LoginRequest, type RegisterRequest, type AuthResponse } from './auth';
+// Auth Types
+export const UserRole = {
+  ADMIN: 'admin',
+  OWNER: 'owner',
+  EDITOR: 'editor',
+  VIEWER: 'viewer'
+} as const;
+
+export type UserRoleType = typeof UserRole[keyof typeof UserRole];
+
+export interface User {
+  user_id: string;
+  email: string;
+  username: string;
+  role: UserRoleType;
+  organization_id: string | null;
+  active: boolean;
+  created_at: string;
+  updated_at: string;
+  allowed_bots: string[] | null;
+}
+
+export interface LoginRequest {
+  email: string;
+  password: string;
+}
+
+export interface RegisterRequest {
+  email: string;
+  username: string;
+  password: string;
+  role?: UserRoleType;
+  organization_id?: string;
+  allowed_bots?: string[];
+}
+
+export interface AuthResponse {
+  access_token: string;
+  token_type: string;
+  user: User;
+}
