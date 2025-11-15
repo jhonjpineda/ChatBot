@@ -2,7 +2,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
-from app.api import chat, documents, bots, analytics, auth
+from app.api import chat_enhanced, documents, bots, analytics, auth_db
+from app.database.connection import init_db
 
 app = FastAPI(
     title=settings.APP_NAME,
@@ -23,11 +24,18 @@ app.add_middleware(
 )
 
 # Rutas principales
-app.include_router(auth.router, prefix="/auth", tags=["Authentication"])
-app.include_router(chat.router, prefix="/chat", tags=["Chat"])
+app.include_router(auth_db.router, prefix="/auth", tags=["Authentication"])
+app.include_router(chat_enhanced.router, prefix="/chat", tags=["Chat"])
 app.include_router(documents.router, prefix="/documents", tags=["Documents"])
 app.include_router(bots.router, prefix="/bots", tags=["Bots"])
 app.include_router(analytics.router, prefix="/analytics", tags=["Analytics"])
+
+
+@app.on_event("startup")
+async def startup_event():
+    """Initialize database on startup"""
+    init_db()
+    print("✅ Database initialized - All tables created")
 
 
 @app.get("/", tags=["Health"])
