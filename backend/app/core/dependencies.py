@@ -4,9 +4,12 @@ Dependencias de FastAPI para autenticación.
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from typing import Optional
+from sqlalchemy.orm import Session
 
 from app.services.auth_service import AuthService
+from app.services.auth_service_db import AuthServiceDB
 from app.models.user import User, UserRole
+from app.database.connection import get_db
 
 security = HTTPBearer()
 
@@ -107,5 +110,66 @@ def require_editor_or_above(current_user: User = Depends(get_current_user)) -> U
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Se requiere rol de editor o superior"
+        )
+    return current_user
+
+
+# ============================================================================
+# Dependencias para PostgreSQL (versiones _db)
+# ============================================================================
+
+def get_current_user_db(
+    credentials: HTTPAuthorizationCredentials = Depends(security),
+    db: Session = Depends(get_db)
+):
+    """
+    Dependencia que obtiene el usuario actual desde el token JWT (PostgreSQL).
+    Lanza excepción si el token es inválido.
+    """
+    auth_service = AuthServiceDB(db)
+    token = credentials.credentials
+
+    token_data = auth_service.decode_token(token)
+
+    if token_data is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token inválido o expirado",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    user = auth_service.get_user_by_id(token_data.user_id)
+
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Usuario no encontrado"
+        )
+
+    if not user.active:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Usuario inactivo"
+        )
+
+    return user
+
+
+def require_admin_db(current_user = Depends(get_current_user_db)):
+    """Solo admins (PostgreSQL)"""
+    if current_user.role != UserRole.ADMIN:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Se requiere rol de administrador"
+        )
+    return current_user
+
+
+def require_owner_or_admin_db(current_user = Depends(get_current_user_db)):
+    """Owners o admins (PostgreSQL)"""
+    if current_user.role not in [UserRole.ADMIN, UserRole.OWNER]:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Se requiere rol de owner o administrador"
         )
     return current_user
