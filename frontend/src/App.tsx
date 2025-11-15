@@ -2,13 +2,14 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './contexts/AuthContext';
 import PrivateRoute from './components/PrivateRoute';
-import Layout from './components/Layout';
+import LayoutWithApproval from './components/LayoutWithApproval';
 import Dashboard from './pages/Dashboard';
 import Bots from './pages/Bots';
 import Documents from './pages/Documents';
 import Analytics from './pages/Analytics';
 import ChatDemo from './pages/ChatDemo';
 import Users from './pages/Users';
+import UserApproval from './pages/UserApproval';
 import Login from './pages/Login';
 import Register from './pages/Register';
 
@@ -37,7 +38,7 @@ function App() {
               path="/"
               element={
                 <PrivateRoute>
-                  <Layout />
+                  <LayoutWithApproval />
                 </PrivateRoute>
               }
             >
@@ -47,6 +48,7 @@ function App() {
               <Route path="analytics" element={<Analytics />} />
               <Route path="chat" element={<ChatDemo />} />
               <Route path="users" element={<Users />} />
+              <Route path="approvals" element={<UserApproval />} />
             </Route>
 
             {/* Ruta por defecto - redirigir a home */}
