@@ -12,6 +12,7 @@ sys.path.insert(0, '/home/user/ChatBot/backend')
 from app.database.connection import SessionLocal, init_db
 from app.services.auth_service_db import AuthServiceDB
 from app.schemas.user import UserCreate, UserRole
+from app.database.models import Organization
 
 def create_admin_user():
     """Crea el primer usuario administrador"""
@@ -51,15 +52,38 @@ def create_admin_user():
     try:
         auth_service = AuthServiceDB(db)
 
-        # Crear organización automáticamente
-        organization_id = uuid.uuid4()
+        # Primero crear la organización (o usar existente)
+        print("⏳ Verificando organización...")
+        org_slug = "admin-org"
+
+        # Verificar si ya existe
+        existing_org = db.query(Organization).filter(Organization.slug == org_slug).first()
+
+        if existing_org:
+            organization = existing_org
+            print(f"✅ Usando organización existente: {organization.name}")
+        else:
+            organization_id = uuid.uuid4()
+            organization = Organization(
+                organization_id=organization_id,
+                name="Organización Principal",
+                slug=org_slug,
+                description="Organización principal del sistema",
+                active=True,
+                max_bots=100,
+                max_users=100
+            )
+            db.add(organization)
+            db.commit()
+            db.refresh(organization)
+            print(f"✅ Organización creada: {organization.name}")
 
         user_data = UserCreate(
             email=email,
             username=username,
             password=password,
             role=UserRole.ADMIN,
-            organization_id=organization_id,
+            organization_id=organization.organization_id,
             allowed_bots=[]
         )
 
