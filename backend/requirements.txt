@@ -10,6 +10,15 @@ pydantic-settings==2.4.0
 # HTTP client
 requests==2.32.3
 
+# Base de datos PostgreSQL
+sqlalchemy==2.0.25
+psycopg2-binary==2.9.9
+alembic==1.13.1
+
+# Autenticación JWT
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+
 # RAG y vectores
 chromadb==0.5.4
 sentence-transformers==2.7.0
