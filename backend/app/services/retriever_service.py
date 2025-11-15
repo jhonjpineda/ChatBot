@@ -14,14 +14,18 @@ class RetrieverService:
         """
         Convierte distancia de ChromaDB a score de similitud (0.0-1.0).
 
-        ChromaDB usa distancia L2 (Euclidean):
+        ChromaDB usa distancia L2 (Euclidean). Distancias pueden ser > 2.0
+        dependiendo de la dimensionalidad de los embeddings.
+
         - distance = 0.0 → 100% similar (similarity = 1.0)
         - distance = 1.0 → ~50% similar (similarity = 0.5)
-        - distance = 2.0 → 0% similar (similarity = 0.0)
+        - distance = 2.0 → ~33% similar (similarity = 0.33)
+        - distance = 3.0 → ~25% similar (similarity = 0.25)
 
-        Formula: similarity = max(0, 1 - distance)
+        Formula: similarity = 1 / (1 + distance)
+        Esto asegura que similarity siempre esté entre 0 y 1.
         """
-        return max(0.0, min(1.0, 1.0 - distance))
+        return 1.0 / (1.0 + distance)
 
     def search(
         self,
